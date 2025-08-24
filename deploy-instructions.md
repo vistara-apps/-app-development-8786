@@ -53,21 +53,23 @@ Follow these steps to deploy the booking integration branch to Vercel:
 
 ## Vercel Configuration
 
-The repository already includes a `vercel.json` configuration file with the following settings:
+The repository includes an updated `vercel.json` configuration file with the following settings:
 
 ```json
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    }
-  ],
+  "framework": "vite",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "routes": [
+    {
+      "src": "/assets/(.*)",
+      "headers": { "cache-control": "public, max-age=31536000, immutable" },
+      "continue": true
+    },
+    {
+      "handle": "filesystem"
+    },
     {
       "src": "/(.*)",
       "dest": "/index.html"
@@ -77,9 +79,18 @@ The repository already includes a `vercel.json` configuration file with the foll
 ```
 
 This configuration:
-- Uses the static build preset for Vite
-- Sets the output directory to `dist`
-- Configures routes to support client-side routing
+- Specifies Vite as the framework
+- Sets the build command and output directory
+- Configures proper asset caching
+- Ensures all routes are handled correctly for a single-page application
+
+## Troubleshooting Module Script Loading Issues
+
+If you encounter the error: `Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of "text/html"`, the updated configuration should fix this by:
+
+1. Properly handling asset routes with correct MIME types
+2. Using the filesystem handler for static assets
+3. Falling back to index.html for client-side routing
 
 ## Environment Variables
 
@@ -87,12 +98,6 @@ If your application requires environment variables, you can set them in the Verc
 1. Go to your project settings
 2. Navigate to the "Environment Variables" tab
 3. Add the required variables
-
-## Troubleshooting
-
-- **Build Errors**: Check the build logs in the Vercel dashboard for any errors
-- **Routing Issues**: Ensure the routes in `vercel.json` are correctly configured
-- **API Connection Issues**: Verify that your API endpoints are correctly configured and accessible
 
 ## Accessing Your Deployment
 
