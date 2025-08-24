@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-bg text-text;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer components {
+  .text-display {
+    @apply text-4xl font-semibold tracking-tight;
+  }
+  .text-heading {
+    @apply text-2xl font-bold;
+  }
+  .text-subheading {
+    @apply text-xl font-semibold;
+  }
+  .text-body {
+    @apply text-base leading-7;
+  }
+  .text-caption {
+    @apply text-sm text-muted;
+  }
+}
