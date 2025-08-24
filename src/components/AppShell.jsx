@@ -9,7 +9,8 @@ import {
   Scissors,
   Menu,
   X,
-  ChevronRight
+  ChevronRight,
+  Link as LinkIcon
 } from 'lucide-react'
 import { useSalon } from '../contexts/SalonContext'
 
@@ -40,6 +41,7 @@ const AppShell = ({ children }) => {
     { name: 'Clients', href: '/clients', icon: Users },
     { name: 'Campaigns', href: '/campaigns', icon: MessageSquare },
     { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+    { name: 'Booking Integration', href: '/booking-integration', icon: LinkIcon },
     { name: 'Settings', href: '/settings', icon: Settings },
   ]
 
