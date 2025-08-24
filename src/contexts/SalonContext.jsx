@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
+import { scheduleFollowUpSequence } from '../services/messagingService'
 
 const SalonContext = createContext()
 
@@ -16,6 +17,7 @@ export const SalonProvider = ({ children }) => {
   const [campaigns, setCampaigns] = useState([])
   const [appointments, setAppointments] = useState([])
   const [messageLogs, setMessageLogs] = useState([])
+  const [scheduledMessages, setScheduledMessages] = useState([])
 
   // Mock data initialization
   useEffect(() => {
@@ -28,7 +30,11 @@ export const SalonProvider = ({ children }) => {
       settings: {
         autoReply: true,
         rebookingWindow: 24,
-        lapsedClientThreshold: 60
+        lapsedClientThreshold: 60,
+        messagingEnabled: true,
+        defaultFollowUpDelay: 24, // hours
+        defaultReminderDelay: 21, // days
+        defaultTipDelay: 3 // days
       }
     })
 
@@ -75,7 +81,7 @@ export const SalonProvider = ({ children }) => {
         type: 'rebooking',
         status: 'active',
         triggerConditions: 'appointment_cancelled',
-        messageTemplate: "Hi {name}! We noticed you had to cancel your appointment. We have some great time slots available - would you like to reschedule?"
+        messageTemplate: "Hi {client_name}! We noticed you had to cancel your appointment. We have some great time slots available - would you like to reschedule?"
       },
       {
         id: '2',
@@ -89,7 +95,7 @@ export const SalonProvider = ({ children }) => {
     ])
 
     // Mock appointments data
-    setAppointments([
+    const mockAppointments = [
       {
         id: '1',
         clientId: '1',
@@ -97,8 +103,8 @@ export const SalonProvider = ({ children }) => {
         datetime: new Date('2024-01-25T14:00:00'),
         service: 'Cut & Color',
         stylist: 'Jennifer',
-        status: 'cancelled',
-        cancellationReason: 'personal emergency'
+        status: 'completed',
+        cancellationReason: null
       },
       {
         id: '2',
@@ -109,8 +115,40 @@ export const SalonProvider = ({ children }) => {
         stylist: 'Maria',
         status: 'scheduled',
         cancellationReason: null
+      },
+      {
+        id: '3',
+        clientId: '3',
+        salonId: '1',
+        datetime: new Date('2024-01-22T15:30:00'),
+        service: 'Haircut & Styling',
+        stylist: 'Carlos',
+        status: 'completed',
+        cancellationReason: null
+      },
+      {
+        id: '4',
+        clientId: '1',
+        salonId: '1',
+        datetime: new Date('2023-12-15T11:00:00'),
+        service: 'Blowout',
+        stylist: 'Jennifer',
+        status: 'completed',
+        cancellationReason: null
+      },
+      {
+        id: '5',
+        clientId: '3',
+        salonId: '1',
+        datetime: new Date('2024-02-05T13:00:00'),
+        service: 'Beard Trim',
+        stylist: 'Carlos',
+        status: 'cancelled',
+        cancellationReason: 'schedule conflict'
       }
-    ])
+    ];
+    
+    setAppointments(mockAppointments);
 
     // Mock message logs
     setMessageLogs([
@@ -121,9 +159,98 @@ export const SalonProvider = ({ children }) => {
         sentAt: new Date('2024-01-25T14:30:00'),
         content: "Hi Sarah! We noticed you had to cancel your appointment. We have some great time slots available - would you like to reschedule?",
         response: "Yes, can I book for tomorrow at 2pm?"
+      },
+      {
+        id: '2',
+        campaignId: null,
+        clientId: '3',
+        sentAt: new Date('2024-01-23T10:15:00'),
+        content: "Hi Michael! Thank you for visiting Luxe Hair Studio! We hope you're enjoying your new look. How was your experience with Carlos?",
+        response: "It was great! I'll definitely be back."
       }
     ])
+
+    // Generate mock scheduled messages based on completed appointments
+    const completedAppointments = mockAppointments.filter(apt => apt.status === 'completed');
+    let mockScheduledMessages = [];
+    
+    completedAppointments.forEach(appointment => {
+      const client = clients.find(c => c.id === appointment.clientId);
+      if (client) {
+        const messages = scheduleFollowUpSequence(appointment, client, {
+          id: '1',
+          name: 'Luxe Hair Studio'
+        });
+        mockScheduledMessages = [...mockScheduledMessages, ...messages];
+      }
+    });
+    
+    setScheduledMessages(mockScheduledMessages);
   }, [])
+
+  // Function to create a new scheduled message
+  const createScheduledMessage = (message, scheduledTime) => {
+    const newScheduledMessage = {
+      id: Math.random().toString(36).substring(2, 15),
+      message,
+      scheduledTime,
+      status: 'scheduled'
+    };
+    
+    setScheduledMessages([...scheduledMessages, newScheduledMessage]);
+    return newScheduledMessage;
+  };
+
+  // Function to update a scheduled message
+  const updateScheduledMessage = (messageId, updatedMessage) => {
+    const updatedMessages = scheduledMessages.map(msg => 
+      msg.id === messageId 
+        ? { ...msg, message: { ...msg.message, ...updatedMessage } }
+        : msg
+    );
+    
+    setScheduledMessages(updatedMessages);
+  };
+
+  // Function to cancel a scheduled message
+  const cancelScheduledMessage = (messageId) => {
+    const updatedMessages = scheduledMessages.map(msg => 
+      msg.id === messageId 
+        ? { ...msg, status: 'cancelled' }
+        : msg
+    );
+    
+    setScheduledMessages(updatedMessages);
+  };
+
+  // Function to log a sent message
+  const logSentMessage = (message, response = null) => {
+    const newMessageLog = {
+      id: Math.random().toString(36).substring(2, 15),
+      campaignId: message.campaignId || null,
+      clientId: message.clientId,
+      sentAt: new Date(),
+      content: message.body,
+      response
+    };
+    
+    setMessageLogs([...messageLogs, newMessageLog]);
+    return newMessageLog;
+  };
+
+  // Function to create a follow-up sequence for an appointment
+  const createFollowUpSequence = (appointmentId) => {
+    const appointment = appointments.find(apt => apt.id === appointmentId);
+    if (!appointment) return null;
+    
+    const client = clients.find(c => c.id === appointment.clientId);
+    if (!client) return null;
+    
+    const messages = scheduleFollowUpSequence(appointment, client, salon);
+    setScheduledMessages([...scheduledMessages, ...messages]);
+    
+    return messages;
+  };
 
   const value = {
     salon,
@@ -135,7 +262,14 @@ export const SalonProvider = ({ children }) => {
     appointments,
     setAppointments,
     messageLogs,
-    setMessageLogs
+    setMessageLogs,
+    scheduledMessages,
+    setScheduledMessages,
+    createScheduledMessage,
+    updateScheduledMessage,
+    cancelScheduledMessage,
+    logSentMessage,
+    createFollowUpSequence
   }
 
   return (

@@ -9,7 +9,8 @@ import {
   Scissors,
   Menu,
   X,
-  ChevronRight
+  ChevronRight,
+  Mail
 } from 'lucide-react'
 import { useSalon } from '../contexts/SalonContext'
 
@@ -39,6 +40,7 @@ const AppShell = ({ children }) => {
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
     { name: 'Clients', href: '/clients', icon: Users },
     { name: 'Campaigns', href: '/campaigns', icon: MessageSquare },
+    { name: 'Messaging', href: '/messaging', icon: Mail },
     { name: 'Analytics', href: '/analytics', icon: BarChart3 },
     { name: 'Settings', href: '/settings', icon: Settings },
   ]
