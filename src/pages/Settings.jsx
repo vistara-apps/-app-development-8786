@@ -86,9 +86,18 @@ const Settings = () => {
       {/* Integration Settings */}
       <Card>
         <Card.Header>
-          <div className="flex items-center">
-            <LinkIcon className="h-5 w-5 mr-2" />
-            <h2 className="text-heading">Booking Software Integration</h2>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <LinkIcon className="h-5 w-5 mr-2" />
+              <h2 className="text-heading">Booking Software Integration</h2>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => window.location.href = '/booking-integration'}
+            >
+              Advanced Settings
+            </Button>
           </div>
         </Card.Header>
         <Card.Content>
@@ -126,6 +135,11 @@ const Settings = () => {
             <Alert>
               <strong>Integration Status:</strong> Connected to {salonInfo.bookingSoftwareType}
             </Alert>
+            
+            <p className="text-sm text-muted">
+              For advanced integration options, including OAuth setup and webhook configuration, 
+              visit the <a href="/booking-integration" className="text-primary hover:underline">Booking Integration</a> page.
+            </p>
           </div>
         </Card.Content>
       </Card>

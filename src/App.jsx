@@ -7,6 +7,7 @@ import Campaigns from './pages/Campaigns'
 import Analytics from './pages/Analytics'
 import Settings from './pages/Settings'
 import Onboarding from './pages/Onboarding'
+import BookingIntegration from './pages/BookingIntegration'
 import { SalonProvider } from './contexts/SalonContext'
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/onboarding" element={<Onboarding />} />
+          <Route path="/booking-integration" element={<BookingIntegration />} />
         </Routes>
       </AppShell>
     </SalonProvider>
