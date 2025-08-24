@@ -8,7 +8,8 @@ import {
   Clock,
   DollarSign,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  Mail
 } from 'lucide-react'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
@@ -88,17 +89,46 @@ const Dashboard = () => {
         </Card>
       </div>
 
+      {/* New Feature Highlight */}
+      <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20">
+        <Card.Content className="p-6">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+              <div className="inline-block bg-primary text-white text-xs font-medium px-2.5 py-1 rounded mb-2">
+                NEW FEATURE
+              </div>
+              <h2 className="text-heading mb-2">Automated Post-Appointment Messaging</h2>
+              <p className="text-body mb-4">
+                Our new messaging system automatically sends personalized follow-ups, styling tips, and rebooking reminders to your clients after their appointments.
+              </p>
+            </div>
+            <Link to="/messaging">
+              <Button>
+                <Mail className="h-4 w-4 mr-2" />
+                Try Messaging
+              </Button>
+            </Link>
+          </div>
+        </Card.Content>
+      </Card>
+
       {/* Quick Actions */}
       <Card>
         <Card.Header>
           <h2 className="text-heading">Quick Actions</h2>
         </Card.Header>
         <Card.Content>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Link to="/campaigns">
               <Button variant="outline" className="w-full justify-start">
                 <MessageSquare className="h-4 w-4 mr-2" />
                 Create New Campaign
+              </Button>
+            </Link>
+            <Link to="/messaging">
+              <Button variant="outline" className="w-full justify-start">
+                <Mail className="h-4 w-4 mr-2" />
+                Manage Messages
               </Button>
             </Link>
             <Link to="/clients">
